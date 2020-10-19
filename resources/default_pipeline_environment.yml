@@ -200,14 +200,6 @@ steps:
     stashContent:
       - 'tests'
     testReportFilePath: 'cst-report.json'
-  cloudFoundryCreateService:
-    cloudFoundry:
-      apiEndpoint: 'https://api.cf.eu10.hana.ondemand.com'
-      serviceManifest: 'service-manifest.yml'
-    dockerImage: 'ppiper/cf-cli'
-    dockerWorkspace: '/home/piper'
-    stashContent:
-      - 'deployDescriptor'
   cloudFoundryCreateServiceKey:
     dockerImage: 'ppiper/cf-cli'
     dockerWorkspace: '/home/piper'
@@ -429,7 +421,7 @@ steps:
     timeoutInSeconds: 900
   pipelineStashFilesAfterBuild:
     stashIncludes:
-      buildResult: '**/target/*.jar, **/*.mtar'
+      buildResult: '**/target/*.war, **/target/*.jar, **/*.mtar'
       checkmarx: '**/*.js, **/*.scala, **/*.py, **/*.go, **/*.d, **/*.di, **/*.xml, **/*.html'
       classFiles: '**/target/classes/**/*.class, **/target/test-classes/**/*.class'
       sonar: '**/jacoco*.exec, **/sonar-project.properties'
@@ -551,6 +543,14 @@ steps:
       allowEmptyResults: true
       archive: false
       active: false
+    htmlPublisher:
+      allowMissing: true
+      alwaysLinkToLastBuild: false
+      keepAll: true
+      reportDir: ""
+      pattern: "**/reports/coverage-reports/**/index.html"
+      reportName: "Results"
+      active: false
   checkChangeInDevelopment:
       failIfStatusIsNotInDevelopment: true
   tmsUpload:
@@ -578,6 +578,10 @@ steps:
       - 'tests'
     testOptions: ''
     runCommand: "uiveri5 --seleniumAddress='http://${config.seleniumHost}:${config.seleniumPort}/wd/hub'"
+  writeTemporaryCredentials:
+    credentialsDirectories:
+      - './'
+      - 'integration-tests/src/test/resources'
 
   #defaults for stage wrapper
   piperStageWrapper:
